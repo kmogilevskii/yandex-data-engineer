@@ -324,13 +324,13 @@ from
 PostgreSQL функция percentile_disc позволяет динамически определить квантиль распределения по имени столбца.
 Она прекрасно работает на `recency` и `monetary_value`
 
-![recency check](./images/recency_quantile_check.png)
+![recency check](images/recency_quantile_check.png)
 
-![monetary value check](./images/monetary_value_quantile_check.png)
+![monetary value check](images/monetary_value_quantile_check.png)
 
 Однако для `frequency` никак не получается получить правильные границы динамически по непонятной мне причине
 
-![акуйгутсн check](./images/frequency_quantile_check.png)
+![акуйгутсн check](images/frequency_quantile_check.png)
 
 В папке `quantiles` есть python script, который использует функцию `qcut` библиотеки `pandas` для прямого определения границ квантилей.
 Если брать значения напрямую оттуда, то получится красиво. Однако на данный момент я оставил динамическое решение.
