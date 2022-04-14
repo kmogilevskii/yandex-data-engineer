@@ -231,7 +231,7 @@ CREATE TABLE analysis.dm_rfm_segments (
 	frequency int2 NOT NULL,
 	monetary_value int2 NOT NULL,	
 	CONSTRAINT dm_rfm_segments_recency_check CHECK (((recency >= (1)) AND (recency <= 5))),
-	CONSTRAINT dm_rfm_segments_frequence_check CHECK (((frequence >= (1)) AND (frequence <= 5))),
+	CONSTRAINT dm_rfm_segments_frequence_check CHECK (((frequency >= (1)) AND (frequency <= 5))),
 	CONSTRAINT dm_rfm_segments_monetary_value_check CHECK (((monetary_value >= (1)) AND (monetary_value <= 5))),
 	CONSTRAINT users_pkey PRIMARY KEY (user_id)
 );
@@ -260,6 +260,7 @@ with user_stats as (
 			sum(payment) as total_revenue
 		from 
 			analysis.orders
+		where status = 4 -- considering only fulfilled orders
 		group by user_id
 ),
 
