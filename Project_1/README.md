@@ -237,7 +237,7 @@ CREATE TABLE analysis.dm_rfm_segments (
 );
 
 
--- production.orderstatuslog foreign keys
+-- analysis.dm_rfm_segments foreign keys
 
 ALTER TABLE analysis.dm_rfm_segments ADD CONSTRAINT dm_rfm_segments_user_id_fkey FOREIGN KEY (user_id) REFERENCES production.users(id);
 ```
