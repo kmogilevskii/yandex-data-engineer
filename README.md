@@ -1,1 +1,0 @@
-# yandex-data-engineer
