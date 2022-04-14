@@ -1,0 +1,1 @@
+This repo contains projects fulfilled during Yandex Data Engineer bootcamp.
