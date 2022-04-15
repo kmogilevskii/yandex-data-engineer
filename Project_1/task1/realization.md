@@ -293,5 +293,5 @@ from
 ![monetary value check](images/monetary_value_quantile_check.png)
 
 
-![акуйгутсн check](images/frequency_quantile_check.png)
+![frequency check](images/frequency_quantile_check.png)
 
