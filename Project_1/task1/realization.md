@@ -251,87 +251,47 @@ ALTER TABLE analysis.dm_rfm_segments ADD CONSTRAINT dm_rfm_segments_user_id_fkey
 ```SQL
 --Впишите сюда ваш ответ
 
-insert into analysis.dm_rfm_segments (user_id, recency, frequency, monetary_value)
-with user_stats as (
-		select 	
-			user_id,
-			MAX(order_ts) as most_recent_order,
-			count(order_id) as total_num_orders,
-			sum(payment) as total_revenue
-		from 
-			analysis.orders
-		where status = 4 -- considering only fulfilled orders
-		group by user_id
-),
+with user_stats as ( 
 
-percentiles as (
-	select 
-		percentile_disc(0.2) within group (order by most_recent_order) as most_recent_order1,
-		percentile_disc(0.4) within group (order by most_recent_order) as most_recent_order2,
-		percentile_disc(0.6) within group (order by most_recent_order) as most_recent_order3,
-		percentile_disc(0.8) within group (order by most_recent_order) as most_recent_order4,
-		
-		percentile_disc(0.2) within group (order by total_num_orders) as total_num_orders1,
-		percentile_disc(0.4) within group (order by total_num_orders) as total_num_orders2,
-		percentile_disc(0.6) within group (order by total_num_orders) as total_num_orders3,
-		percentile_disc(0.8) within group (order by total_num_orders) as total_num_orders4,
-		
-		percentile_disc(0.2) within group (order by total_revenue) as total_revenue1,
-		percentile_disc(0.4) within group (order by total_revenue) as total_revenue2,
-		percentile_disc(0.6) within group (order by total_revenue) as total_revenue3,
-		percentile_disc(0.8) within group (order by total_revenue) as total_revenue4
-	from 
-		user_stats
-),
+		select 	 
 
-user_rfm as (
-	select 
-		user_id,
-		case 
-			when most_recent_order < most_recent_order1 then 1
-			when most_recent_order between most_recent_order1 and most_recent_order2 then 2
-			when most_recent_order between most_recent_order2 and most_recent_order3 then 3
-			when most_recent_order between most_recent_order3 and most_recent_order4 then 4
-			when most_recent_order > most_recent_order4 then 5
-		end as recency,
-		case 
-			when total_num_orders < total_num_orders1 then 1
-			when total_num_orders >= total_num_orders1 and total_num_orders < total_num_orders2 then 2
-			when total_num_orders >= total_num_orders2 and total_num_orders < total_num_orders3 then 3
-			when total_num_orders >= total_num_orders3 and total_num_orders < total_num_orders4 then 4
-			when total_num_orders >= total_num_orders4 then 5
-		end as frequency,
-		case 
-			when total_revenue < total_revenue1 then 1
-			when total_revenue >= total_revenue1 and total_revenue < total_revenue2 then 2
-			when total_revenue >= total_revenue2 and total_revenue < total_revenue3 then 3
-			when total_revenue >= total_revenue3 and total_revenue < total_revenue4 then 4
-			when total_revenue >= total_revenue4 then 5
-		end as monetary_value
-	from 
-		user_stats us
-	cross join percentiles p
+			user_id, 
+
+			MAX(order_ts) as most_recent_order, 
+
+			count(order_id) as total_num_orders, 
+
+			sum(payment) as total_revenue 
+
+		from  
+
+			production.orders 
+
+		where status = 4 -- considering only fulfilled orders 
+
+		group by user_id 
+
 )
 
-select
-	*
-from
-	user_rfm;
+select 
+	*,
+	NTILE(5) OVER(order by most_recent_order desc) as recency,
+	NTILE(5) OVER(order by total_num_orders desc) as frequency,
+	NTILE(5) OVER(order by total_revenue desc) as monetary_value
+from 
+	user_stats;
+
 
 ```
 
 Заметка о качестве распределения:
 
-PostgreSQL функция percentile_disc позволяет динамически определить квантиль распределения по имени столбца.
-Она прекрасно работает на `recency` и `monetary_value`
+Благодаря оконной функции NTILE мы смогли получить равномерное распределение для всех 3х признаков (Recency, Frequency, Monetary Value)
 
 ![recency check](images/recency_quantile_check.png)
 
 ![monetary value check](images/monetary_value_quantile_check.png)
 
-Однако для `frequency` никак не получается получить правильные границы динамически по непонятной мне причине
 
 ![акуйгутсн check](images/frequency_quantile_check.png)
 
-В папке `quantiles` есть python script, который использует функцию `qcut` библиотеки `pandas` для прямого определения границ квантилей.
-Если брать значения напрямую оттуда, то получится красиво. Однако на данный момент я оставил динамическое решение.
