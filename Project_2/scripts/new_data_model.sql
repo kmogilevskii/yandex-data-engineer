@@ -40,11 +40,11 @@ CREATE TABLE public.shipping_info(
    agreementid 			  INT8,
    PRIMARY KEY (shippingid),
    CONSTRAINT fk_shipping_country_id FOREIGN KEY(shipping_country_id)
-   								     REFERENCES public.shipping_country_rates(shipping_country_id),
+   					REFERENCES public.shipping_country_rates(shipping_country_id) ON UPDATE CASCADE,
    CONSTRAINT fk_transfer_type_id FOREIGN KEY(transfer_type_id)
-   								     REFERENCES public.shipping_transfer(transfer_type_id),
+   					REFERENCES public.shipping_transfer(transfer_type_id) ON UPDATE CASCADE,
    CONSTRAINT fk_agreementid FOREIGN KEY(agreementid)
-   								     REFERENCES public.shipping_agreement(agreementid)
+   					REFERENCES public.shipping_agreement(agreementid) ON UPDATE CASCADE
 );
 --shipping_status
 CREATE TABLE public.shipping_status(
