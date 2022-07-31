@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS dds.dm_couriers (
+    id INT4 NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    courier_id VARCHAR NOT NULL,
+    courier_name VARCHAR NOT NULL,
+    active_from TIMESTAMP NOT NULL,
+    active_to TIMESTAMP NOT NULL
+);

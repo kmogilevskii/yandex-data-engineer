@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS dds.dm_deliveries (
+    id INT4 NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    delivery_id VARCHAR NOT NULL,
+    rate smallint NOT NULL
+);
